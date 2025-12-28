@@ -89,6 +89,30 @@ You can extend this application by:
 - **Create templates**: Add HTML files in `main/templates/main/`
 - **Modify settings**: Edit `ort_project/settings.py`
 
+## Security Notes
+
+⚠️ **Important for Production Deployment:**
+
+This project is configured for development. Before deploying to production:
+
+1. **Change SECRET_KEY**: Generate a new secret key and store it in environment variables
+   ```python
+   import os
+   SECRET_KEY = os.environ.get('SECRET_KEY')
+   ```
+
+2. **Disable DEBUG**: Set `DEBUG = False` in settings.py
+
+3. **Configure ALLOWED_HOSTS**: Add your domain to `ALLOWED_HOSTS`
+
+4. **Use HTTPS**: Enable SSL/HTTPS settings (SECURE_SSL_REDIRECT, SECURE_HSTS_SECONDS, etc.)
+
+5. **Use Production Database**: Switch from SQLite to PostgreSQL or MySQL
+
+6. **Configure Static Files**: Set up proper static file serving
+
+For more information, see [Django's deployment checklist](https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/).
+
 ## License
 
 This project is open source and available for use and modification.
