@@ -1,0 +1,47 @@
+{% extends 'main/base.html' %}
+
+{% block title %}About - ORT Django Web App{% endblock %}
+
+{% block content %}
+<h1>About ORT Django Web App</h1>
+
+<p class="welcome-text">
+    This Django web application was created as a comprehensive starter template for web development.
+</p>
+
+<h2 style="margin-top: 2rem;">Technology Stack</h2>
+<ul class="feature-list">
+    <li><strong>Framework:</strong> Django 6.0</li>
+    <li><strong>Language:</strong> Python 3.12</li>
+    <li><strong>Database:</strong> SQLite (development)</li>
+    <li><strong>Template Engine:</strong> Django Templates</li>
+</ul>
+
+<h2 style="margin-top: 2rem;">Project Structure</h2>
+<div style="background-color: #f8f9fa; padding: 1rem; border-radius: 5px; margin-top: 1rem;">
+    <pre style="font-family: monospace; font-size: 0.9rem;">
+ORT/
+├── manage.py              # Django management script
+├── ort_project/          # Project configuration
+│   ├── settings.py       # Project settings
+│   ├── urls.py           # URL routing
+│   └── wsgi.py           # WSGI configuration
+├── main/                 # Main application
+│   ├── views.py          # View functions
+│   ├── urls.py           # App URL routing
+│   ├── models.py         # Database models
+│   └── templates/        # HTML templates
+└── requirements.txt      # Python dependencies
+    </pre>
+</div>
+
+<h2 style="margin-top: 2rem;">Next Steps</h2>
+<p>You can extend this application by:</p>
+<ul class="feature-list">
+    <li>Creating database models for your data</li>
+    <li>Adding user authentication and authorization</li>
+    <li>Building RESTful APIs with Django REST Framework</li>
+    <li>Integrating with frontend frameworks like React or Vue</li>
+    <li>Deploying to production servers</li>
+</ul>
+{% endblock %}
