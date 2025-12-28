@@ -1,0 +1,34 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Home - ORT Django Web App{% endblock %}
+
+{% block content %}
+<h1>Welcome to ORT Django Web App!</h1>
+<p class="welcome-text">
+    This is a fully functional Django web application created for the ORT repository.
+</p>
+
+<div class="feature-list">
+    <h2>Features:</h2>
+    <ul>
+        <li>✅ Django 6.0 Framework</li>
+        <li>✅ Modern responsive design</li>
+        <li>✅ URL routing and views</li>
+        <li>✅ Template inheritance</li>
+        <li>✅ Admin interface ready</li>
+        <li>✅ SQLite database configured</li>
+        <li>✅ Ready for development</li>
+    </ul>
+</div>
+
+<div style="margin-top: 2rem; padding: 1rem; background-color: #f0f0f0; border-radius: 5px;">
+    <h3>Getting Started:</h3>
+    <p>This Django application is ready to use! You can:</p>
+    <ul style="margin-top: 0.5rem;">
+        <li>Add models in <code>main/models.py</code></li>
+        <li>Create additional views in <code>main/views.py</code></li>
+        <li>Add more templates in <code>main/templates/main/</code></li>
+        <li>Access the admin panel at <a href="/admin/" style="color: #667eea;">/admin/</a></li>
+    </ul>
+</div>
+{% endblock %}
