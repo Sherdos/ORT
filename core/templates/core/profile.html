@@ -1,0 +1,133 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Профиль - ORT Test{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person-circle"></i> Профиль</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="display-1 text-primary mb-3">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+                <h4>{{ user.username }}</h4>
+                <p class="text-muted">{{ user.email|default:"Email не указан" }}</p>
+                <hr>
+                <p class="text-muted mb-0">
+                    <small>Дата регистрации: {{ user.date_joined|date:"d.m.Y" }}</small>
+                </p>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Статистика</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-journal-check"></i> Тестов пройдено</span>
+                    <strong>{{ total_tests }}</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-question-circle"></i> Вопросов отвечено</span>
+                    <strong>{{ total_questions }}</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-check-circle"></i> Правильных ответов</span>
+                    <strong class="text-success">{{ total_correct }}</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-percent"></i> Средний балл</span>
+                    <strong class="{% if average_score >= 70 %}text-success{% elif average_score >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ average_score }}%
+                    </strong>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        {% if common_mistakes %}
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Частые ошибки</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Вопросы, на которых вы чаще всего ошибаетесь:</p>
+                <div class="list-group">
+                    {% for item in common_mistakes %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="me-3">
+                                <p class="mb-1"><strong>{{ item.question.text|truncatewords:30 }}</strong></p>
+                                {% for tag in item.question.tags.all %}
+                                <span class="badge bg-secondary">{{ tag.name }}</span>
+                                {% endfor %}
+                                <span class="badge bg-{{ item.question.difficulty }}">{{ item.question.get_difficulty_display }}</span>
+                            </div>
+                            <span class="badge bg-danger rounded-pill">{{ item.count }} ошибок</span>
+                        </div>
+                        {% if item.question.explanation %}
+                        <small class="text-muted"><i class="bi bi-lightbulb"></i> {{ item.question.explanation|truncatewords:20 }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Последние результаты</h5>
+            </div>
+            {% if recent_attempts %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Тест</th>
+                            <th>Дата</th>
+                            <th>Результат</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for attempt in recent_attempts %}
+                        <tr>
+                            <td>{{ attempt.test.title }}</td>
+                            <td>{{ attempt.started_at|date:"d.m.Y" }}</td>
+                            <td>
+                                <div class="progress" style="min-width: 80px;">
+                                    <div class="progress-bar bg-{% if attempt.percentage >= 70 %}success{% elif attempt.percentage >= 50 %}warning{% else %}danger{% endif %}"
+                                         style="width: {{ attempt.percentage }}%">
+                                        {{ attempt.percentage }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="{% url 'attempt_detail' attempt.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'results' %}" class="btn btn-outline-primary btn-sm">Все результаты</a>
+            </div>
+            {% else %}
+            <div class="card-body text-center text-muted">
+                <p>Вы еще не проходили тесты.</p>
+                <a href="{% url 'tests' %}" class="btn btn-primary">Начать тестирование</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

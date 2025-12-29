@@ -1,0 +1,117 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Результат теста - ORT Test{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'results' %}">Результаты</a></li>
+        <li class="breadcrumb-item active">{{ attempt.test.title }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-trophy"></i> Результат</h5>
+            </div>
+            <div class="card-body text-center">
+                <h1 class="display-3 {% if attempt.percentage >= 70 %}text-success{% elif attempt.percentage >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                    {{ attempt.percentage }}%
+                </h1>
+                <p class="lead">{{ attempt.test.title }}</p>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h4 class="text-success">{{ attempt.correct_answers }}</h4>
+                        <small class="text-muted">Правильных</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-danger">{{ attempt.incorrect_answers }}</h4>
+                        <small class="text-muted">Ошибок</small>
+                    </div>
+                    <div class="col-4">
+                        <h4>{{ attempt.total_questions }}</h4>
+                        <small class="text-muted">Всего</small>
+                    </div>
+                </div>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>Начат</span>
+                    <span>{{ attempt.started_at|date:"d.m.Y H:i" }}</span>
+                </li>
+                {% if attempt.completed_at %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>Завершен</span>
+                    <span>{{ attempt.completed_at|date:"d.m.Y H:i" }}</span>
+                </li>
+                {% endif %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>Баллов получено</span>
+                    <strong>{{ attempt.score }}</strong>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <h4 class="mb-3"><i class="bi bi-list-ol"></i> Разбор ответов</h4>
+
+        {% for answer in answers %}
+        <div class="card mb-3 {% if answer.is_correct %}border-success{% else %}border-danger{% endif %}">
+            <div class="card-header d-flex justify-content-between align-items-center {% if answer.is_correct %}bg-success text-white{% else %}bg-danger text-white{% endif %}">
+                <span>Вопрос {{ forloop.counter }}</span>
+                {% if answer.is_correct %}
+                <span class="badge bg-white text-success"><i class="bi bi-check-lg"></i> Правильно</span>
+                {% else %}
+                <span class="badge bg-white text-danger"><i class="bi bi-x-lg"></i> Неправильно</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <p class="card-text"><strong>{{ answer.question.text }}</strong></p>
+
+                {% if answer.question.image %}
+                <img src="{{ answer.question.image.url }}" class="img-fluid mb-3" style="max-height: 200px;">
+                {% endif %}
+
+                {% if answer.question.type == 'text_input' %}
+                    <p><strong>Ваш ответ:</strong> {{ answer.text_answer|default:"Не отвечено" }}</p>
+                {% else %}
+                    <ul class="list-group">
+                        {% for option in answer.question.options.all %}
+                        <li class="list-group-item 
+                            {% if option.is_correct %}correct-answer{% endif %}
+                            {% if option in answer.selected_options.all and not option.is_correct %}wrong-answer{% endif %}">
+                            {% if option in answer.selected_options.all %}
+                                <i class="bi bi-check-square-fill"></i>
+                            {% else %}
+                                <i class="bi bi-square"></i>
+                            {% endif %}
+                            {{ option.text }}
+                            {% if option.is_correct %}
+                                <span class="badge bg-success float-end">Правильный ответ</span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if answer.question.explanation and not answer.is_correct %}
+                <div class="alert alert-info mt-3 mb-0">
+                    <strong><i class="bi bi-lightbulb"></i> Объяснение:</strong>
+                    {{ answer.question.explanation }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">
+            Нет данных об ответах для этой попытки.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

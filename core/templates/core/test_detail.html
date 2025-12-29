@@ -1,0 +1,97 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ test.title }} - ORT Test{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'tests' %}">Тесты</a></li>
+        <li class="breadcrumb-item active">{{ test.title }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            {% if test.image %}
+            <img src="{{ test.image.url }}" class="card-img-top" alt="{{ test.title }}" style="max-height: 300px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body">
+                <h2 class="card-title">{{ test.title }}</h2>
+                <p class="card-text">{{ test.text|default:"Описание отсутствует"|linebreaks }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Информация о тесте</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-clock"></i> Время на прохождение</span>
+                    <strong>{{ test.duration_minutes }} мин</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-question-circle"></i> Количество вопросов</span>
+                    <strong>{{ test.question_count }}</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-star"></i> Баллов за ответ</span>
+                    <strong>{{ test.points_per_correct_answer }}</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-trophy"></i> Максимум баллов</span>
+                    <strong>{{ test.question_count|floatformat:0 }}</strong>
+                </li>
+            </ul>
+            <div class="card-body">
+                {% if user.is_authenticated %}
+                <a href="#" class="btn btn-success w-100 btn-lg">
+                    <i class="bi bi-play-fill"></i> Начать тест
+                </a>
+                {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary w-100 btn-lg">
+                    <i class="bi bi-box-arrow-in-right"></i> Войдите, чтобы начать
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0"><i class="bi bi-clock-history"></i> Ваши попытки</h6>
+            </div>
+            {% with user_attempts=test.attempts.all %}
+            {% if user_attempts %}
+            <ul class="list-group list-group-flush">
+                {% for attempt in user_attempts|slice:":5" %}
+                {% if attempt.user == user %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">{{ attempt.started_at|date:"d.m.Y H:i" }}</small>
+                        {% if not attempt.is_completed %}
+                        <span class="badge bg-warning">В процессе</span>
+                        {% endif %}
+                    </div>
+                    <span class="badge bg-{% if attempt.percentage >= 70 %}success{% elif attempt.percentage >= 50 %}warning{% else %}danger{% endif %}">
+                        {{ attempt.percentage }}%
+                    </span>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="card-body text-muted">
+                Вы еще не проходили этот тест
+            </div>
+            {% endif %}
+            {% endwith %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

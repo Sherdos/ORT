@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Тесты - ORT Test{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-list-check"></i> Все тесты</h2>
+</div>
+
+<div class="row">
+    {% for test in tests %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card card-test h-100">
+            {% if test.image %}
+            <img src="{{ test.image.url }}" class="card-img-top" alt="{{ test.title }}" style="height: 180px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 180px;">
+                <i class="bi bi-journal-text text-white" style="font-size: 4rem;"></i>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ test.title }}</h5>
+                <p class="card-text text-muted">{{ test.text|truncatewords:25|default:"Описание отсутствует" }}</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                    <span><i class="bi bi-clock"></i> Время</span>
+                    <strong>{{ test.duration_minutes }} мин</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span><i class="bi bi-question-circle"></i> Вопросов</span>
+                    <strong>{{ test.question_count }}</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span><i class="bi bi-star"></i> Баллов за ответ</span>
+                    <strong>{{ test.points_per_correct_answer }}</strong>
+                </li>
+            </ul>
+            <div class="card-footer bg-transparent">
+                <a href="{% url 'test_detail' test.pk %}" class="btn btn-primary w-100">
+                    <i class="bi bi-eye"></i> Подробнее
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Тесты пока не добавлены. Проверьте позже!
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

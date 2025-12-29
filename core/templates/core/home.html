@@ -1,0 +1,96 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Главная - ORT Test{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="jumbotron bg-light p-5 rounded-3 mb-4">
+            <h1 class="display-5">Добро пожаловать в ORT Test!</h1>
+            <p class="lead">Подготовьтесь к ОРТ с нашей платформой тестирования. Проходите тесты, анализируйте ошибки и улучшайте свои результаты.</p>
+            <hr class="my-4">
+            {% if user.is_authenticated %}
+            <p>Привет, <strong>{{ user.username }}</strong>! Готовы к новому тесту?</p>
+            <a class="btn btn-primary btn-lg" href="{% url 'tests' %}">
+                <i class="bi bi-play-fill"></i> Начать тестирование
+            </a>
+            {% else %}
+            <p>Войдите или зарегистрируйтесь, чтобы начать.</p>
+            <a class="btn btn-primary btn-lg me-2" href="{% url 'login' %}">Войти</a>
+            <a class="btn btn-outline-primary btn-lg" href="{% url 'register' %}">Регистрация</a>
+            {% endif %}
+        </div>
+
+        <h3 class="mb-3"><i class="bi bi-collection"></i> Доступные тесты</h3>
+        <div class="row">
+            {% for test in tests %}
+            <div class="col-md-6 mb-4">
+                <div class="card card-test h-100">
+                    {% if test.image %}
+                    <img src="{{ test.image.url }}" class="card-img-top" alt="{{ test.title }}" style="height: 150px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ test.title }}</h5>
+                        <p class="card-text text-muted">{{ test.text|truncatewords:20 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> {{ test.duration_minutes }} мин
+                                <i class="bi bi-question-circle ms-2"></i> {{ test.question_count }} вопросов
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'test_detail' test.pk %}" class="btn btn-primary w-100">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-muted">Тесты пока не добавлены.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        {% if user.is_authenticated and recent_attempts %}
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-clock-history"></i> Последние результаты
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for attempt in recent_attempts %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ attempt.test.title|truncatewords:3 }}</strong>
+                        <br>
+                        <small class="text-muted">{{ attempt.started_at|date:"d.m.Y" }}</small>
+                    </div>
+                    <span class="badge bg-{% if attempt.percentage >= 70 %}success{% elif attempt.percentage >= 50 %}warning{% else %}danger{% endif %} rounded-pill">
+                        {{ attempt.percentage }}%
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="card-footer">
+                <a href="{% url 'results' %}" class="btn btn-sm btn-outline-primary w-100">Все результаты</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card {% if user.is_authenticated and recent_attempts %}mt-4{% endif %}">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-info-circle"></i> Как это работает?
+            </div>
+            <div class="card-body">
+                <ol class="mb-0">
+                    <li class="mb-2">Выберите тест из списка</li>
+                    <li class="mb-2">Ответьте на все вопросы</li>
+                    <li class="mb-2">Получите результат</li>
+                    <li>Анализируйте ошибки в профиле</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
